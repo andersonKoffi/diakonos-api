@@ -1,5 +1,7 @@
-branch=$(git symbolic-ref --short HEAD 2>/dev/null)
-if [ "$branch" = "main" ]; then
-  echo "⛔ Push direct sur main interdit — passe par une PR (Gitflow)."
-  exit 1
-fi
+# git passe sur stdin chaque ref poussée : <ref locale> <sha> <ref distante> <sha>
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "⛔ Push direct sur main interdit — passe par une PR (Gitflow)."
+    exit 1
+  fi
+done
