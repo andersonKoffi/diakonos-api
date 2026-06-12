@@ -1,0 +1,30 @@
+# Dependencies & build
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Tests & coverage
+coverage/
+.nyc_output/
+
+# Logs & OS
+*.log
+.DS_Store
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Prisma / DB
+*.sql.dump
+*.dump
+
+# Divers
+tmp/
