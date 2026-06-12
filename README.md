@@ -7,7 +7,7 @@ API REST NestJS multi-tenant (shared schema + RLS PostgreSQL) exposant la spec O
 ## Prérequis
 
 - Node 22 LTS
-- Docker (PostgreSQL 16 + MinIO en local)
+- Docker (PostgreSQL 16 en local)
 - npm
 
 ## Setup local
@@ -16,7 +16,7 @@ API REST NestJS multi-tenant (shared schema + RLS PostgreSQL) exposant la spec O
 git clone <repo> && cd diakonos-api
 npm ci
 cp .env.example .env        # compléter les valeurs
-docker compose up -d        # PostgreSQL + MinIO
+docker compose up -d        # PostgreSQL
 npx prisma migrate dev
 npm run seed
 npm run start:dev

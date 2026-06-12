@@ -3,6 +3,12 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Client Prisma généré (régénéré via `prisma generate`)
+src/generated/
+
+# Uploads locaux (pièces justificatives)
+storage/
+
 # Env
 .env
 .env.*
