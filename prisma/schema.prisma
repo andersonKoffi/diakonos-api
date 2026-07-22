@@ -287,30 +287,31 @@ model ExpenseCategory {
 }
 
 model Expense {
-  id              String        @id @default(uuid(7)) @db.Uuid
-  tenantId        String        @map("tenant_id") @db.Uuid
+  id              String          @id @default(uuid(7)) @db.Uuid
+  tenantId        String          @map("tenant_id") @db.Uuid
   reference       String
   label           String
   description     String?
-  amount          Decimal       @db.Decimal(18, 2)
-  currencyId      String        @map("currency_id") @db.Uuid
-  categoryId      String        @map("category_id") @db.Uuid
-  status          ExpenseStatus @default(DRAFT)
-  expenseDate     DateTime      @map("expense_date") @db.Date
-  requesterId     String        @map("requester_id") @db.Uuid
-  departmentId    String?       @map("department_id") @db.Uuid
-  eventId         String?       @map("event_id") @db.Uuid
-  fundId          String?       @map("fund_id") @db.Uuid
-  submittedAt     DateTime?     @map("submitted_at")
-  approvedAt      DateTime?     @map("approved_at")
-  approvedById    String?       @map("approved_by_id") @db.Uuid
-  rejectionReason String?       @map("rejection_reason")
-  paidAt          DateTime?     @map("paid_at")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  deletedAt       DateTime?     @map("deleted_at")
-  createdBy       String?       @map("created_by") @db.Uuid
-  updatedBy       String?       @map("updated_by") @db.Uuid
+  amount          Decimal         @db.Decimal(18, 2)
+  currencyId      String          @map("currency_id") @db.Uuid
+  categoryId      String          @map("category_id") @db.Uuid
+  paymentMethod   PaymentChannel? @map("payment_method")
+  status          ExpenseStatus   @default(DRAFT)
+  expenseDate     DateTime        @map("expense_date") @db.Date
+  requesterId     String          @map("requester_id") @db.Uuid
+  departmentId    String?         @map("department_id") @db.Uuid
+  eventId         String?         @map("event_id") @db.Uuid
+  fundId          String?         @map("fund_id") @db.Uuid
+  submittedAt     DateTime?       @map("submitted_at")
+  approvedAt      DateTime?       @map("approved_at")
+  approvedById    String?         @map("approved_by_id") @db.Uuid
+  rejectionReason String?         @map("rejection_reason")
+  paidAt          DateTime?       @map("paid_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  deletedAt       DateTime?       @map("deleted_at")
+  createdBy       String?         @map("created_by") @db.Uuid
+  updatedBy       String?         @map("updated_by") @db.Uuid
 
   tenant      Tenant              @relation(fields: [tenantId], references: [id])
   currency    Currency            @relation(fields: [currencyId], references: [id])

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsDateString,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
@@ -8,6 +9,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { PaymentChannel } from '../../../generated/prisma/enums';
 
 export class CreateExpenseDto {
   @ApiProperty({ example: 'Carburant mission Yamoussoukro' })
@@ -39,6 +41,14 @@ export class CreateExpenseDto {
   @ApiProperty({ example: '2026-07-08', description: 'Date de la dépense' })
   @IsDateString()
   expenseDate: string;
+
+  @ApiPropertyOptional({
+    enum: PaymentChannel,
+    description: 'Moyen de paiement utilisé',
+  })
+  @IsOptional()
+  @IsEnum(PaymentChannel)
+  paymentMethod?: PaymentChannel;
 
   @ApiPropertyOptional({ description: 'Département rattaché' })
   @IsOptional()

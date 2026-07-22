@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -10,6 +20,7 @@ import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { ExpenseResponseDto } from './dto/expense-response.dto';
 import { ListExpensesQueryDto } from './dto/list-expenses-query.dto';
+import { RejectExpenseDto } from './dto/reject-expense.dto';
 
 @ApiTags('Frais de note')
 @ApiBearerAuth()
@@ -22,9 +33,16 @@ export class ExpensesController {
   @ApiOperation({
     summary: "Lister les frais de l'église de l'utilisateur connecté",
   })
-  @ApiResponse({ status: 200, type: [ExpenseResponseDto] })
   findAll(@Query() query: ListExpensesQueryDto) {
     return this.expensesService.findAll(query);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: "Détail d'un frais" })
+  @ApiResponse({ status: 200, type: ExpenseResponseDto })
+  @ApiResponse({ status: 404, description: 'Frais introuvable' })
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ExpenseResponseDto> {
+    return this.expensesService.findOne(id);
   }
 
   @Post()
@@ -32,5 +50,49 @@ export class ExpensesController {
   @ApiResponse({ status: 201, type: ExpenseResponseDto })
   create(@Body() dto: CreateExpenseDto): Promise<ExpenseResponseDto> {
     return this.expensesService.create(dto);
+  }
+
+  @Patch(':id/submit')
+  @ApiOperation({
+    summary: 'Soumettre le frais pour validation (DRAFT → SUBMITTED)',
+  })
+  @ApiResponse({ status: 200, type: ExpenseResponseDto })
+  submit(@Param('id', ParseUUIDPipe) id: string): Promise<ExpenseResponseDto> {
+    return this.expensesService.submit(id);
+  }
+
+  @Patch(':id/approve')
+  @ApiOperation({
+    summary: 'Valider le frais (SUBMITTED → APPROVED)',
+    description:
+      'Au-delà de 100 000 XOF, le validateur doit être différent du demandeur.',
+  })
+  @ApiResponse({ status: 200, type: ExpenseResponseDto })
+  @ApiResponse({ status: 403, description: 'Auto-validation interdite' })
+  approve(@Param('id', ParseUUIDPipe) id: string): Promise<ExpenseResponseDto> {
+    return this.expensesService.approve(id);
+  }
+
+  @Patch(':id/reject')
+  @ApiOperation({
+    summary: 'Rejeter le frais avec motif (SUBMITTED → REJECTED)',
+  })
+  @ApiResponse({ status: 200, type: ExpenseResponseDto })
+  reject(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: RejectExpenseDto,
+  ): Promise<ExpenseResponseDto> {
+    return this.expensesService.reject(id, dto.reason);
+  }
+
+  @Patch(':id/pay')
+  @ApiOperation({
+    summary: 'Marquer le frais comme remboursé (APPROVED → PAID)',
+  })
+  @ApiResponse({ status: 200, type: ExpenseResponseDto })
+  markPaid(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ExpenseResponseDto> {
+    return this.expensesService.markPaid(id);
   }
 }
