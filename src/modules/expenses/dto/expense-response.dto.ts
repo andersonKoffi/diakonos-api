@@ -61,6 +61,12 @@ export class ExpenseResponseDto {
   })
   fundType?: string | null;
 
+  @ApiPropertyOptional({ example: 'Convention nationale' })
+  event?: string | null;
+
+  @ApiPropertyOptional()
+  eventId?: string | null;
+
   @ApiProperty({ example: 'Awa Comptable' })
   requester: string;
 

@@ -59,4 +59,9 @@ export class CreateExpenseDto {
   @IsOptional()
   @IsUUID()
   fundId?: string;
+
+  @ApiPropertyOptional({ description: 'Événement rattaché' })
+  @IsOptional()
+  @IsUUID()
+  eventId?: string;
 }

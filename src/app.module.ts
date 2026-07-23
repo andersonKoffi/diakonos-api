@@ -8,7 +8,11 @@ import { TenantModule } from './core/tenant/tenant.module';
 import { AuthModule } from './core/auth/auth.module';
 import { HealthModule } from './core/health/health.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
-import { ReferenceModule } from './modules/reference/reference.module';
+import { DepartmentsModule } from './modules/departments/departments.module';
+import { ExpenseCategoriesModule } from './modules/expense-categories/expense-categories.module';
+import { CurrenciesModule } from './modules/currencies/currencies.module';
+import { FundsModule } from './modules/funds/funds.module';
+import { EventsModule } from './modules/events/events.module';
 
 @Module({
   imports: [
@@ -26,7 +30,11 @@ import { ReferenceModule } from './modules/reference/reference.module';
     AuthModule,
     HealthModule,
     ExpensesModule,
-    ReferenceModule,
+    DepartmentsModule,
+    ExpenseCategoriesModule,
+    CurrenciesModule,
+    FundsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

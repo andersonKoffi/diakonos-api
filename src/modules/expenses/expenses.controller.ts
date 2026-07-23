@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -18,6 +20,7 @@ import {
 import { JwtAuthGuard } from '../../core/auth/jwt-auth.guard';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
+import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { ExpenseResponseDto } from './dto/expense-response.dto';
 import { ListExpensesQueryDto } from './dto/list-expenses-query.dto';
 import { RejectExpenseDto } from './dto/reject-expense.dto';
@@ -50,6 +53,30 @@ export class ExpensesController {
   @ApiResponse({ status: 201, type: ExpenseResponseDto })
   create(@Body() dto: CreateExpenseDto): Promise<ExpenseResponseDto> {
     return this.expensesService.create(dto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({
+    summary: 'Modifier un frais de note (réservé au statut brouillon)',
+  })
+  @ApiResponse({ status: 200, type: ExpenseResponseDto })
+  @ApiResponse({ status: 400, description: "Le frais n'est plus un brouillon" })
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateExpenseDto,
+  ): Promise<ExpenseResponseDto> {
+    return this.expensesService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @ApiOperation({
+    summary: 'Supprimer un frais de note (réservé au statut brouillon)',
+  })
+  @ApiResponse({ status: 204, description: 'Supprimé' })
+  @ApiResponse({ status: 400, description: "Le frais n'est plus un brouillon" })
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.expensesService.remove(id);
   }
 
   @Patch(':id/submit')

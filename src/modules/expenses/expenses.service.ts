@@ -10,6 +10,7 @@ import { TENANT_PRISMA } from '../../core/prisma/prisma.module';
 import type { TenantPrismaClient } from '../../core/prisma/prisma.module';
 import { ExpenseStatus } from '../../generated/prisma/enums';
 import { CreateExpenseDto } from './dto/create-expense.dto';
+import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { ExpenseResponseDto } from './dto/expense-response.dto';
 import { ListExpensesQueryDto } from './dto/list-expenses-query.dto';
 
@@ -28,6 +29,7 @@ export class ExpensesService {
     category: { select: { name: true } },
     department: { select: { name: true } },
     fund: { select: { name: true, type: true } },
+    event: { select: { name: true } },
     requester: { select: { firstName: true, lastName: true } },
     approvedBy: { select: { firstName: true, lastName: true } },
   };
@@ -92,6 +94,7 @@ export class ExpensesService {
         expenseDate: new Date(dto.expenseDate),
         departmentId: dto.departmentId,
         fundId: dto.fundId,
+        eventId: dto.eventId,
         requesterId: userId,
         createdBy: userId,
       },
@@ -99,6 +102,45 @@ export class ExpensesService {
     });
 
     return ExpensesService.toDto(created);
+  }
+
+  /** Édition d'un frais — réservée au statut DRAFT (au-delà, la donnée est engagée). */
+  async update(id: string, dto: UpdateExpenseDto): Promise<ExpenseResponseDto> {
+    const expense = await this.requireExpense(id);
+    if (expense.status !== ExpenseStatus.DRAFT) {
+      throw new BadRequestException(
+        'Seul un frais en brouillon peut être modifié',
+      );
+    }
+    return this.transition(id, {
+      label: dto.label,
+      description: dto.description,
+      amount: dto.amount,
+      currencyId: dto.currencyId,
+      categoryId: dto.categoryId,
+      expenseDate: new Date(dto.expenseDate),
+      paymentMethod: dto.paymentMethod,
+      departmentId: dto.departmentId,
+      fundId: dto.fundId,
+      eventId: dto.eventId,
+    });
+  }
+
+  /** Suppression (douce) d'un frais — réservée au statut DRAFT. */
+  async remove(id: string): Promise<void> {
+    const expense = await this.requireExpense(id);
+    if (expense.status !== ExpenseStatus.DRAFT) {
+      throw new BadRequestException(
+        'Seul un frais en brouillon peut être supprimé',
+      );
+    }
+    await this.prisma.expense.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        updatedBy: this.cls.get<string>('userId'),
+      },
+    });
   }
 
   /** DRAFT -> SUBMITTED : le demandeur envoie son frais en validation. */
@@ -208,6 +250,7 @@ export class ExpensesService {
     expenseDate: Date;
     departmentId: string | null;
     fundId: string | null;
+    eventId: string | null;
     requesterId: string;
     submittedAt: Date | null;
     approvedAt: Date | null;
@@ -217,6 +260,7 @@ export class ExpensesService {
     category: { name: string };
     department: { name: string } | null;
     fund: { name: string; type: string } | null;
+    event: { name: string } | null;
     requester: { firstName: string; lastName: string };
     approvedBy: { firstName: string; lastName: string } | null;
   }): ExpenseResponseDto {
@@ -238,6 +282,8 @@ export class ExpensesService {
       fund: e.fund?.name ?? null,
       fundId: e.fundId,
       fundType: e.fund?.type ?? null,
+      event: e.event?.name ?? null,
+      eventId: e.eventId,
       requester: `${e.requester.firstName} ${e.requester.lastName}`,
       requesterId: e.requesterId,
       submittedAt: e.submittedAt,

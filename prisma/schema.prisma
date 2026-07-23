@@ -240,17 +240,21 @@ model Event {
 }
 
 model Fund {
-  id          String    @id @default(uuid(7)) @db.Uuid
-  tenantId    String    @map("tenant_id") @db.Uuid
-  name        String
-  type        FundType
-  description String?
-  isActive    Boolean   @default(true) @map("is_active")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
-  createdBy   String?   @map("created_by") @db.Uuid
-  updatedBy   String?   @map("updated_by") @db.Uuid
+  id               String    @id @default(uuid(7)) @db.Uuid
+  tenantId         String    @map("tenant_id") @db.Uuid
+  name             String
+  type             FundType
+  description      String?
+  isActive         Boolean   @default(true) @map("is_active")
+  goal             Decimal?  @db.Decimal(18, 2)
+  prudentialFloor  Decimal?  @map("prudential_floor") @db.Decimal(18, 2)
+  boardDecisionRef String?   @map("board_decision_ref")
+  closed           Boolean   @default(false)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+  createdBy        String?   @map("created_by") @db.Uuid
+  updatedBy        String?   @map("updated_by") @db.Uuid
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id])
   expenses Expense[]
