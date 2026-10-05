@@ -34,3 +34,6 @@ coverage/
 
 # Divers
 tmp/
+
+# Vercel
+.vercel
