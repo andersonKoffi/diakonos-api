@@ -39,7 +39,9 @@ async function main() {
   });
 
   // --- 3. Utilisateurs de test ---
-  const passwordHash = await bcrypt.hash('Password123!', 10);
+  // Base hébergée (démo) : définir SEED_PASSWORD. Défaut = mot de passe de dev local.
+  const seedPassword = process.env.SEED_PASSWORD ?? 'Password123!';
+  const passwordHash = await bcrypt.hash(seedPassword, 10);
 
   const accountant = await prisma.user.upsert({
     where: { email: 'comptable@msa.ci' },
@@ -125,7 +127,9 @@ async function main() {
 
   console.log(`Tenant : ${tenant.name} (${tenant.id})`);
   console.log(`Users  : ${accountant.email}, ${treasurer.email}`);
-  console.log(`Mot de passe de test : Password123!`);
+  if (!process.env.SEED_PASSWORD) {
+    console.log(`Mot de passe de test : ${seedPassword}`);
+  }
 }
 
 main()

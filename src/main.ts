@@ -24,18 +24,24 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('Diakonos API')
-    .setDescription(
-      'API de gestion financière ecclésiale du réseau MSA — Sophos Studios',
-    )
-    .setVersion('0.1.0')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document, {
-    jsonDocumentUrl: 'api/docs-json',
-  });
+  // Swagger exposé hors production uniquement (SWAGGER_ENABLED=true pour le forcer).
+  if (
+    process.env.NODE_ENV !== 'production' ||
+    process.env.SWAGGER_ENABLED === 'true'
+  ) {
+    const config = new DocumentBuilder()
+      .setTitle('Diakonos API')
+      .setDescription(
+        'API de gestion financière ecclésiale du réseau MSA — Sophos Studios',
+      )
+      .setVersion('0.1.0')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document, {
+      jsonDocumentUrl: 'api/docs-json',
+    });
+  }
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
